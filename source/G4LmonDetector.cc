@@ -5,6 +5,7 @@
 #include <Geant4/G4Box.hh>
 #include <Geant4/G4Color.hh>
 #include <Geant4/G4LogicalVolume.hh>
+#include <Geant4/G4NistManager.hh>
 #include <Geant4/G4Material.hh>
 #include <Geant4/G4PVPlacement.hh>
 #include <Geant4/G4SubtractionSolid.hh>
@@ -41,23 +42,21 @@ int G4LmonDetector::IsInDetector(G4VPhysicalVolume *volume) const
 
 void G4LmonDetector::ConstructMe(G4LogicalVolume *logicWorld)
 {
-  double xdim = 20*cm;
-  double ydim = 20*cm;
-  double zdim = 20*cm;
-  G4VSolid *solidbox = new G4Box("Example01BoxSolid", xdim/2., ydim/2., zdim/2.);
-  G4VSolid *cylcut = new G4Tubs("CylinderCutSolid", 0., xdim/4., zdim, 0., M_PI*rad);
-  G4VSolid *subtract = new G4SubtractionSolid("HoleInBox",solidbox,cylcut);
-  G4LogicalVolume *logical = new G4LogicalVolume(subtract, G4Material::GetMaterial("G4_Al"), "BoxWithHoleLogical");
-
+  G4Material* top_m = G4NistManager::Instance()->FindOrBuildMaterial("G4_Galactic");
+  G4VSolid *top_s = new G4Box("top_s", 2*meter, 2*meter, 3500*cm);
+  G4LogicalVolume *top_l = new G4LogicalVolume(top_s, top_m, "top_l");
+  G4VPhysicalVolume *top_p = new G4PVPlacement(0, G4ThreeVector(), top_l, "top_p", 0, false, 0);
+/*
   G4VisAttributes *vis = new G4VisAttributes(G4Color(G4Colour::Grey())); // grey is good to see the tracks in the display
   vis->SetForceSolid(true);
   logical->SetVisAttributes(vis);
   G4VPhysicalVolume *phy = new G4PVPlacement(nullptr, G4ThreeVector(0,0, 0),
                                                logical, "BoxWithHole",
                                                logicWorld, 0, false, OverlapCheck());
+*/
 // add it to the list of placed volumes so the IsInDetector method
 // picks them up
-    m_PhysicalVolumesSet.insert(phy);
+    m_PhysicalVolumesSet.insert(top_p);
   return;
 }
 
