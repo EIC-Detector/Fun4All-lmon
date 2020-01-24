@@ -7,12 +7,18 @@
 
 #include <set>
 #include <string>  // for string
+#include <vector>
 
 class G4LogicalVolume;
 class G4VPhysicalVolume;
 class PHCompositeNode;
 class PHG4Subsystem;
 class PHParameters;
+
+class CompCal;
+class Cell;
+class ExitWindowV2;
+class OpDet;
 
 class G4LmonDetector : public PHG4Detector
 {
@@ -41,6 +47,10 @@ class G4LmonDetector : public PHG4Detector
   std::set<G4VPhysicalVolume *> m_PhysicalVolumesSet;
 
   std::string m_SuperDetector;
+  std::vector<CompCal *> m_CompCalVector;
+  std::vector<Cell *> m_CellVector;
+  std::vector<ExitWindowV2 *> m_ExitWindowV2Vector;
+  std::vector<OpDet *> m_OpDetVector;
 };
 
 #endif  // G4LMONDETECTOR_H

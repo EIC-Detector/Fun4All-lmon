@@ -1,4 +1,8 @@
 #include "G4LmonDetector.h"
+#include "ExitWindowV2.h"
+#include "CompCal.h"
+#include "Collimator.h"
+#include "Magnet.h"
 
 #include <g4main/PHG4Detector.h>  // for PHG4Detector
 
@@ -45,18 +49,17 @@ void G4LmonDetector::ConstructMe(G4LogicalVolume *logicWorld)
   G4Material* top_m = G4NistManager::Instance()->FindOrBuildMaterial("G4_Galactic");
   G4VSolid *top_s = new G4Box("top_s", 2*meter, 2*meter, 3500*cm);
   G4LogicalVolume *top_l = new G4LogicalVolume(top_s, top_m, "top_l");
-  G4VPhysicalVolume *top_p = new G4PVPlacement(0, G4ThreeVector(), top_l, "top_p", 0, false, 0);
-/*
-  G4VisAttributes *vis = new G4VisAttributes(G4Color(G4Colour::Grey())); // grey is good to see the tracks in the display
-  vis->SetForceSolid(true);
-  logical->SetVisAttributes(vis);
-  G4VPhysicalVolume *phy = new G4PVPlacement(nullptr, G4ThreeVector(0,0, 0),
-                                               logical, "BoxWithHole",
-                                               logicWorld, 0, false, OverlapCheck());
-*/
-// add it to the list of placed volumes so the IsInDetector method
-// picks them up
-    m_PhysicalVolumesSet.insert(top_p);
+  G4VPhysicalVolume *top_p = new G4PVPlacement(nullptr, G4ThreeVector(0,0,0), top_l, "top_p", logicWorld, false, 0);
+  cout << "G4Lmon" << endl;
+  new ExitWindowV2("ew", -20.75*meter, top_l);
+  new Collimator(-22.1*meter, top_l);
+  new Magnet(-22.5*meter, top_l);
+  //detectors
+  G4double dpos = -3135*cm;
+  new CompCal("phot", dpos-50*cm, 0, top_l);
+  new CompCal("up", dpos, 4.2*cm, top_l);
+  new CompCal("down", dpos, -4.2*cm, top_l);
+  m_PhysicalVolumesSet.insert(top_p);
   return;
 }
 

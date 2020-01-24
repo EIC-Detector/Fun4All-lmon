@@ -46,9 +46,16 @@ endif
 
 libg4lmondetector_la_SOURCES = \
   $(ROOT5_DICTS) \
+  Cell.cxx \
+  Collimator.cxx \
+  CompCal.cxx \
+  ExitWindowV2.cxx \
   G4LmonDetector.cc \
   G4LmonSubsystem.cc \
-  G4LmonSteppingAction.cc
+  G4LmonSteppingAction.cc \
+  Magnet.cxx \
+  OpDet.cxx \
+  OpTable.cxx 
 
 # Rule for generating table CINT dictionaries.
 %_Dict.cc: %.h %LinkDef.h
