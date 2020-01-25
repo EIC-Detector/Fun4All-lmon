@@ -11,6 +11,7 @@
 #include "CompCal.h"
 #include "OpTable.h"
 #include "OpDet.h"
+#include "RootOut.h"
 
 //ROOT
 #include <TTree.h>
@@ -38,10 +39,10 @@
 
 
 //_____________________________________________________________________________
-Cell::Cell(const G4String& nam, G4int ix, G4int iy, G4int ncells, G4double zpos, G4double ypos, G4LogicalVolume *top, CompCal& d):
+Cell::Cell(const G4String& nam, G4int ix, G4int iy, G4int ncells, G4double zpos, G4double ypos, G4LogicalVolume *top, CompCal& d, RootOut *rout):
   fNam(nam), det(d) {
 
-  G4cout << "  Cell::Cell: " << fNam << G4endl;
+//  G4cout << "  Cell::Cell: " << fNam << G4endl;
 
   //alveole size
   G4double asiz = 3*cm;
@@ -105,15 +106,17 @@ Cell::Cell(const G4String& nam, G4int ix, G4int iy, G4int ncells, G4double zpos,
   G4double ycen = y0 - iy*asiz;
 
   //cell alveole in top volume
-  new G4PVPlacement(0, G4ThreeVector(xcen, ycen, zpos-zlen/2.), alv_l, alv_nam, top, false, 0);
+  G4VPhysicalVolume *alvvol = new G4PVPlacement(nullptr, G4ThreeVector(xcen, ycen, zpos-zlen/2.), alv_l, alv_nam, top, false, 0);
+  m_PhysicalVolumes.insert(alvvol);
 
   //crystal in top volume
-  G4VPhysicalVolume *csens = new G4PVPlacement(0, G4ThreeVector(xcen, ycen, zpos-zlen/2.), crystal_l, fNam, top, false, 0);
+  G4VPhysicalVolume *csens = new G4PVPlacement(nullptr, G4ThreeVector(xcen, ycen, zpos-zlen/2.), crystal_l, fNam, top, false, 0);
+  m_PhysicalVolumes.insert(csens);
 
   //attach optical photon detector, 1.7x1.7 cm
   fOpDet = new OpDet(fNam+"_OpDet", 1.7*cm, zpos-zlen, xcen, ycen, top);
   optab->MakeBoundary(csens, fOpDet->GetPhysicalVolume());
-
+  fOpDet->CreateOutput(rout->GetTree());
   //indices to identify scintillation and Cerenkov processes
   G4Scintillation scin;
   fScinType = scin.GetProcessType();
@@ -127,8 +130,14 @@ Cell::Cell(const G4String& nam, G4int ix, G4int iy, G4int ncells, G4double zpos,
 }//Cell
 
 //_____________________________________________________________________________
-G4bool Cell::ProcessHits(G4Step *step, G4TouchableHistory*) {
+G4bool Cell::ProcessHits(const G4Step *step, G4TouchableHistory*) {
 
+ G4TouchableHandle touch = step->GetPreStepPoint()->GetTouchableHandle();
+ G4VPhysicalVolume* volume = touch->GetVolume();
+ if (m_PhysicalVolumes.find(volume) == m_PhysicalVolumes.end())
+ {
+   return false;
+ }
   //hit in this cell
 
   //G4cout << "Cell::ProcessHits, " << fNam << G4endl;

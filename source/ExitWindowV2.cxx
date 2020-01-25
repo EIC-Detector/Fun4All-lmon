@@ -67,7 +67,7 @@ ExitWindowV2::ExitWindowV2(const G4String& nam, G4double zpos, G4LogicalVolume *
 }//ExitWindowV2
 
 //_____________________________________________________________________________
-G4bool ExitWindowV2::ProcessHits(G4Step *step, G4TouchableHistory*) {
+G4bool ExitWindowV2::ProcessHits(const G4Step *step, G4TouchableHistory*) {
 
   //track in current step
   G4Track *track = step->GetTrack();

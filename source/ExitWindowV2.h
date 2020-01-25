@@ -25,7 +25,7 @@ class ExitWindowV2 {
     virtual void FinishEvent();
 
     //G4VSensitiveDetector
-    virtual G4bool ProcessHits(G4Step *step, G4TouchableHistory*);
+    virtual G4bool ProcessHits(const G4Step *step, G4TouchableHistory*);
 
   private:
 

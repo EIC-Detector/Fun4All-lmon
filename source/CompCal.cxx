@@ -9,6 +9,7 @@
 #include "CompCal.h"
 #include "Cell.h"
 #include "OpDet.h"
+#include "RootOut.h"
 
 //ROOT
 #include <TTree.h>
@@ -21,10 +22,10 @@
 
 
 //_____________________________________________________________________________
-CompCal::CompCal(const G4String& nam, G4double zpos, G4double ypos, G4LogicalVolume *top): 
+CompCal::CompCal(const G4String& nam, G4double zpos, G4double ypos, G4LogicalVolume *top, RootOut *rout): 
   fNam(nam) {
 
-  G4cout << "CompCal::CompCal: " << fNam << G4endl;
+//  G4cout << "CompCal::CompCal: " << fNam << G4endl;
 
   //number of cells in x and y
   G4int ncells = 7;
@@ -45,8 +46,9 @@ CompCal::CompCal(const G4String& nam, G4double zpos, G4double ypos, G4LogicalVol
       ss << iy;
 
       G4String cell_nam = fNam + ss.str();
-
-      fCells->push_back( new Cell(cell_nam, ix, iy, ncells, zpos, ypos, top, *this) );
+      Cell *cl = new Cell(cell_nam, ix, iy, ncells, zpos, ypos, top, *this, rout);
+      fCells->push_back(cl);
+      cl->CreateOutput(rout->GetTree());
     }
   }
 

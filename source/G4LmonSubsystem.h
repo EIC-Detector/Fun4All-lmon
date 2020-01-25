@@ -11,6 +11,8 @@ class PHCompositeNode;
 class PHG4Detector;
 class G4LmonDetector;
 class PHG4SteppingAction;
+class RootOut;
+class PHG4EventAction;
 
 /**
    * \brief example Fun4All module
@@ -26,7 +28,7 @@ class G4LmonSubsystem : public PHG4Subsystem
 {
  public:
   //! constructor
-  G4LmonSubsystem(const std::string& name = "Example01");
+  G4LmonSubsystem(const std::string& name = "LMon");
 
   //! destructor
   virtual ~G4LmonSubsystem(){}
@@ -46,12 +48,14 @@ class G4LmonSubsystem : public PHG4Subsystem
   virtual int process_event(PHCompositeNode*);
 
   //! accessors (reimplemented)
-  virtual PHG4Detector* GetDetector() const;
+  PHG4Detector* GetDetector() const;
 
-  virtual PHG4SteppingAction* GetSteppingAction() const {return  m_SteppingAction;}
+  PHG4SteppingAction* GetSteppingAction() const {return  m_SteppingAction;}
+
+  PHG4EventAction *GetEventAction(void) const {return m_EventAction;}
   //! Print info (from SubsysReco)
   virtual void Print(const std::string& what = "ALL") const;
-
+  void SetFileName(const std::string &fname) {m_rootname = fname;}
  private:
 
   //! detector geometry
@@ -61,6 +65,9 @@ class G4LmonSubsystem : public PHG4Subsystem
   //! particle tracking "stepping" action
   /*! derives from PHG4SteppingActions */
   PHG4SteppingAction* m_SteppingAction;
+  PHG4EventAction *m_EventAction;
+  RootOut *rootoutput;
+  std::string m_rootname;
 };
 
 #endif  // G4LMONSUBSYSTEM_H

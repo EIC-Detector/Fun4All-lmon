@@ -51,11 +51,13 @@ libg4lmondetector_la_SOURCES = \
   CompCal.cxx \
   ExitWindowV2.cxx \
   G4LmonDetector.cc \
+  G4LmonEventAction.cc \
   G4LmonSubsystem.cc \
   G4LmonSteppingAction.cc \
   Magnet.cxx \
   OpDet.cxx \
-  OpTable.cxx 
+  OpTable.cxx \
+  RootOut.cxx
 
 # Rule for generating table CINT dictionaries.
 %_Dict.cc: %.h %LinkDef.h

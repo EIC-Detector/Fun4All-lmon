@@ -11,12 +11,13 @@
 class Cell;
 class G4LogicalVolume;
 class TTree;
+class RootOut;
 
 class CompCal {
 
   public:
 
-    CompCal(const G4String&, G4double zpos, G4double ypos, G4LogicalVolume*);
+  CompCal(const G4String&, G4double zpos, G4double ypos, G4LogicalVolume*, RootOut *rout);
     virtual ~CompCal() {}
 
 //    virtual void Add(std::vector<Detector*> *vec);

@@ -23,7 +23,7 @@ class OpDet {
     virtual ~OpDet();
 
     //G4VSensitiveDetector
-    virtual G4bool ProcessHits(G4Step *step, G4TouchableHistory*);
+    virtual G4bool ProcessHits(const G4Step *step, G4TouchableHistory*);
 
     //Detector
 //    virtual void Add(std::vector<Detector*> *vec) {vec->push_back(this);}

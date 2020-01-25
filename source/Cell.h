@@ -7,23 +7,27 @@
 #include <Geant4/globals.hh>
 #include <Rtypes.h>
 
+#include <set>
+
 class G4LogicalVolume;
 class CompCal;
 class OpDet;
 class Detector;
 class G4Step;
 class G4TouchableHistory;
+class G4VPhysicalVolume;
 class TTree;
+class RootOut;
 
 class Cell {
 
   public:
 
-    Cell(const G4String& nam, G4int ix, G4int iy, G4int ncells, G4double zpos, G4double ypos, G4LogicalVolume *top, CompCal&);
+  Cell(const G4String& nam, G4int ix, G4int iy, G4int ncells, G4double zpos, G4double ypos, G4LogicalVolume *top, CompCal&, RootOut *rout);
     virtual ~Cell() {}
 
     //from G4VSensitiveDetector
-    virtual G4bool ProcessHits(G4Step *step, G4TouchableHistory*);
+    virtual G4bool ProcessHits(const G4Step *step, G4TouchableHistory*);
 
     //from Detector
 //    virtual void Add(std::vector<Detector*> *vec);
@@ -54,7 +58,7 @@ class Cell {
 
     CompCal& det; //ref to detector where this cell is included
     friend class CompCal;
-
+    std::set<G4VPhysicalVolume *> m_PhysicalVolumes;
 };
 
 #endif

@@ -1,8 +1,11 @@
 #include "G4LmonDetector.h"
 #include "ExitWindowV2.h"
+#include "Cell.h"
 #include "CompCal.h"
 #include "Collimator.h"
 #include "Magnet.h"
+#include "OpDet.h"
+#include "RootOut.h"
 
 #include <g4main/PHG4Detector.h>  // for PHG4Detector
 
@@ -49,23 +52,82 @@ void G4LmonDetector::ConstructMe(G4LogicalVolume *logicWorld)
   G4Material* top_m = G4NistManager::Instance()->FindOrBuildMaterial("G4_Galactic");
   G4VSolid *top_s = new G4Box("top_s", 2*meter, 2*meter, 3500*cm);
   G4LogicalVolume *top_l = new G4LogicalVolume(top_s, top_m, "top_l");
-  G4VPhysicalVolume *top_p = new G4PVPlacement(nullptr, G4ThreeVector(0,0,0), top_l, "top_p", logicWorld, false, 0);
-  cout << "G4Lmon" << endl;
-  new ExitWindowV2("ew", -20.75*meter, top_l);
+  new G4PVPlacement(nullptr, G4ThreeVector(0,0,0), top_l, "top_p", logicWorld, false, 0);
+  ExitWindowV2 *ew = new ExitWindowV2("ew", -20.75*meter, top_l);
+  m_ExitWindowV2Vector.push_back(ew);
+  ew->CreateOutput(rootoutput->GetTree());
   new Collimator(-22.1*meter, top_l);
   new Magnet(-22.5*meter, top_l);
   //detectors
   G4double dpos = -3135*cm;
-  new CompCal("phot", dpos-50*cm, 0, top_l);
-  new CompCal("up", dpos, 4.2*cm, top_l);
-  new CompCal("down", dpos, -4.2*cm, top_l);
-  m_PhysicalVolumesSet.insert(top_p);
+  CompCal *cmpcal = new CompCal("phot", dpos-50*cm, 0, top_l, rootoutput);
+  cmpcal->CreateOutput(rootoutput->GetTree());
+  m_CompCalVector.push_back(cmpcal);
+  cmpcal = new CompCal("up", dpos, 4.2*cm, top_l,rootoutput );
+  cmpcal->CreateOutput(rootoutput->GetTree());
+  m_CompCalVector.push_back(cmpcal);
+  cmpcal = new CompCal("down", dpos, -4.2*cm, top_l, rootoutput);
+  cmpcal->CreateOutput(rootoutput->GetTree());
+  m_CompCalVector.push_back(cmpcal);
+  return;
+}
+
+bool  G4LmonDetector::ExecuteSteppingActions(const G4Step* aStep)
+{
+  bool bret = false;
+  
+  for (auto iter=m_CellVector.begin(); iter != m_CellVector.end(); ++iter)
+  {
+    bret |= (*iter)->ProcessHits(aStep, nullptr);
+  }
+  for (auto iter=m_ExitWindowV2Vector.begin(); iter != m_ExitWindowV2Vector.end(); ++iter)
+  {
+    bret |= (*iter)->ProcessHits(aStep, nullptr);
+  }
+  for (auto iter=m_OpDetVector.begin(); iter != m_OpDetVector.end(); ++iter)
+  {
+    bret |= (*iter)->ProcessHits(aStep, nullptr);
+  }
+  return bret;
+}
+
+void  G4LmonDetector::ClearEvent()
+{
+  for (auto iter=m_CellVector.begin(); iter != m_CellVector.end(); ++iter)
+  {
+    (*iter)->ClearEvent();
+  }
+  for (auto iter=m_ExitWindowV2Vector.begin(); iter != m_ExitWindowV2Vector.end(); ++iter)
+  {
+    (*iter)->ClearEvent();
+  }
+  for (auto iter=m_OpDetVector.begin(); iter != m_OpDetVector.end(); ++iter)
+  {
+    (*iter)->ClearEvent();
+  }
+  return;
+}
+
+void  G4LmonDetector::FinishEvent()
+{
+  for (auto iter=m_CompCalVector.begin(); iter != m_CompCalVector.end(); ++iter)
+  {
+    (*iter)->FinishEvent();
+  }
+  for (auto iter=m_ExitWindowV2Vector.begin(); iter != m_ExitWindowV2Vector.end(); ++iter)
+  {
+    (*iter)->FinishEvent();
+  }
+  for (auto iter=m_OpDetVector.begin(); iter != m_OpDetVector.end(); ++iter)
+  {
+    (*iter)->FinishEvent();
+  }
   return;
 }
 
 void G4LmonDetector::Print(const std::string &what) const
 {
-  cout << "Example01 Detector:" << endl;
+  cout << "Luminosity Monitor Detector:" << endl;
   if (what == "ALL" || what == "VOLUME")
   {
     cout << "Version 0.1" << endl;

@@ -1,6 +1,8 @@
 #include "G4LmonSubsystem.h"
 #include "G4LmonDetector.h"
+#include "G4LmonEventAction.h"
 #include "G4LmonSteppingAction.h"
+#include "RootOut.h"
 
 #include <phparameter/PHParameters.h>
 
@@ -26,6 +28,7 @@ G4LmonSubsystem::G4LmonSubsystem(const std::string &name)
   : PHG4Subsystem(name)
   , m_Detector(nullptr)
   , m_SteppingAction(nullptr)
+  , m_rootname("lmon.root")
 {
   Name(name);
 }
@@ -54,12 +57,18 @@ int G4LmonSubsystem::Init(PHCompositeNode *topNode)
   m_Detector = new G4LmonDetector(this, topNode, Name());
   m_Detector->OverlapCheck(CheckOverlap());
 
+  rootoutput = new RootOut();
+  rootoutput->SetFileName(m_rootname);
+  rootoutput->Open();
+  m_Detector->SetRootOutput(rootoutput);
   // create stepping action
   m_SteppingAction = new G4LmonSteppingAction(m_Detector);
+  m_EventAction = new G4LmonEventAction(rootoutput, m_Detector);
 
   return 0;
 }
 
+  
 //_______________________________________________________________________
 int G4LmonSubsystem::process_event(PHCompositeNode *topNode)
 {

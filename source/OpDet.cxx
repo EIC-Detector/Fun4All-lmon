@@ -34,7 +34,7 @@ OpDet::OpDet(const G4String& name, G4double xysiz, G4double zpos, G4double xmid,
 
   //detector for optical photons
 
-  G4cout << "  OpDet: " << fNam << G4endl;
+//  G4cout << "  OpDet: " << fNam << G4endl;
 
   //OpDet shape
   G4double dz = 0.3*mm; // 300 micro m thickess
@@ -77,7 +77,7 @@ OpDet::~OpDet() {
 }//~OpDet
 
 //_____________________________________________________________________________
-G4bool OpDet::ProcessHits(G4Step *step, G4TouchableHistory*) {
+G4bool OpDet::ProcessHits(const G4Step *step, G4TouchableHistory*) {
 
   //total energy deposition in optical detector
   fEdep += step->GetTotalEnergyDeposit();
