@@ -23,6 +23,9 @@
 /vis/viewer/panTo -23 0 m
 /vis/viewer/zoom 4.5
 
+/vis/ogl/set/displayListLimit 500000
+/vis/scene/endOfEventAction accumulate 1
+
 # Draw trajectories at end of event, showing trajectory points as
 # markers of size 2 pixels
 /vis/scene/add/trajectories smooth
